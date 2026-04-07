@@ -1,0 +1,235 @@
+/* ============================================================
+   LoanLedger — Auth Pages (Login & Register)
+   ============================================================ */
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top left, #fdfdfd 0%, #f1f5f3 100%);
+  padding: 40px 20px;
+  font-family: var(--font-family);
+}
+
+.auth-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  max-width: 440px;
+  overflow: hidden;
+  animation: authFadeIn 0.5s ease-out;
+}
+
+@keyframes authFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.auth-header {
+  padding: 40px 40px 20px;
+  text-align: center;
+}
+
+.auth-brand {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.auth-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-heading);
+  letter-spacing: -0.5px;
+}
+
+.auth-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-body);
+  margin-top: 6px;
+}
+
+.auth-body {
+  padding: 0 40px 40px;
+}
+
+/* ── Form Elements ─────────────────────────────────────────── */
+.auth-form-group {
+  margin-bottom: 20px;
+}
+
+.auth-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-family: var(--font-family);
+  color: var(--color-heading);
+  transition: all 0.2s;
+  outline: none;
+}
+
+.auth-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(46, 125, 91, 0.1);
+}
+
+.auth-input.is-invalid {
+  border-color: #ef4444;
+}
+
+.auth-error-msg {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 5px;
+  font-weight: 500;
+}
+
+/* ── Buttons ───────────────────────────────────────────────── */
+.auth-btn-primary {
+  width: 100%;
+  padding: 13px;
+  background: var(--color-primary);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.auth-btn-primary:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(46, 125, 91, 0.2);
+}
+
+.auth-btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.auth-btn-secondary {
+  width: 100%;
+  padding: 12px;
+  background: #ffffff;
+  color: var(--color-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.auth-btn-secondary:hover {
+  border-color: var(--color-muted);
+  background: #fafafa;
+}
+
+/* ── OTP Specific ──────────────────────────────────────────── */
+.otp-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  text-align: center;
+}
+
+.otp-mobile-badge {
+  background: var(--color-accent);
+  color: var(--color-primary);
+  padding: 10px;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.otp-input-field {
+  letter-spacing: 8px;
+  text-align: center;
+  font-size: 1.8rem !important;
+  font-weight: 700;
+}
+
+/* ── Role Selector ─────────────────────────────────────────── */
+.role-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.role-option {
+  padding: 10px 5px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.role-option.active {
+  background: var(--color-accent);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ── Footer Link ───────────────────────────────────────────── */
+.auth-footer {
+  text-align: center;
+  margin-top: 24px;
+  font-size: var(--font-size-sm);
+  color: var(--color-muted);
+}
+
+.auth-footer-link {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-footer-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Alerts ────────────────────────────────────────────────── */
+.auth-alert-danger {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 500;
+}

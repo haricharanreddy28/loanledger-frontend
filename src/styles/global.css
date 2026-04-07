@@ -1,0 +1,153 @@
+/* ============================================================
+   LoanLedger — Global Design System
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+/* ── CSS Custom Properties (Design Tokens) ─────────────────── */
+:root {
+  /* Colors */
+  --color-bg:           #f7f9f8;
+  --color-card:         #ffffff;
+  --color-primary:      #2e7d5b;
+  --color-primary-dark: #256649;
+  --color-accent:       #e6f4ee;
+  --color-border:       #e5e7eb;
+  --color-footer-bg:    #f1f5f3;
+
+  /* Text */
+  --color-heading:      #1f2937;
+  --color-body:         #4b5563;
+  --color-muted:        #9ca3af;
+
+  /* Status colors */
+  --color-success:      #166534;
+  --color-success-bg:   #f0fdf4;
+  --color-success-border: #bbf7d0;
+  --color-warning:      #92400e;
+  --color-danger:       #991b1b;
+
+  /* Spacing */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  40px;
+  --space-2xl: 72px;
+
+  /* Typography */
+  --font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-size-xs:   0.72rem;
+  --font-size-sm:   0.82rem;
+  --font-size-base: 0.9rem;
+  --font-size-md:   1rem;
+  --font-size-lg:   1.25rem;
+  --font-size-xl:   1.5rem;
+  --font-size-2xl:  2rem;
+  --font-size-3xl:  2.8rem;
+
+  /* Borders */
+  --radius-sm:  4px;
+  --radius-md:  6px;
+  --radius-lg:  10px;
+  --radius-xl:  16px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.08);
+  --shadow-role: 0 4px 16px rgba(46,125,91,0.08);
+}
+
+/* ── Base Reset ────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--color-bg);
+  color: var(--color-body);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font-family: var(--font-family);
+  cursor: pointer;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/* ── Utility: Section wrapper ──────────────────────────────── */
+.section-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+/* ── Utility: Section header ───────────────────────────────── */
+.section-hd {
+  text-align: center;
+  margin-bottom: 44px;
+}
+
+.section-badge {
+  display: inline-block;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-primary);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-heading);
+  letter-spacing: -0.3px;
+}
+
+.section-body {
+  font-size: var(--font-size-base);
+  color: var(--color-body);
+  line-height: 1.75;
+  margin-top: 10px;
+}
+
+/* ── Utility: Background alternates ───────────────────────── */
+.bg-white { background: #ffffff; }
+.bg-soft  { background: var(--color-bg); }
+
+/* ── Utility: Status badges ────────────────────────────────── */
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+.status-active   { background: var(--color-accent); color: var(--color-primary); }
+.status-pending  { background: #fef9c3; color: #854d0e; }
+.status-rejected { background: #fee2e2; color: var(--color-danger); }
+.status-closed   { background: #f3f4f6; color: var(--color-muted); }

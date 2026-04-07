@@ -1,0 +1,108 @@
+/* ============================================================
+   LoanLedger — Premium SaaS Navbar
+   ============================================================ */
+
+.ll-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.ll-navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ll-navbar-brand-dot {
+  width: 10px;
+  height: 10px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  position: relative;
+}
+
+.ll-navbar-brand-dot::after {
+  content: '';
+  position: absolute;
+  top: -4px; left: -4px; right: -4px; bottom: -4px;
+  border: 2px solid var(--color-primary);
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.33); }
+  80%, 100% { opacity: 0; }
+}
+
+.brand-text {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-heading);
+  letter-spacing: -0.5px;
+}
+
+.ll-navbar-title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding-left: 16px;
+  margin-left: 4px;
+  border-left: 1px solid var(--color-border);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ll-navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.ll-user-identity {
+  line-height: 1.2;
+}
+
+.ll-navbar-user {
+  font-size: 0.85rem;
+  color: var(--color-heading);
+}
+
+.ll-navbar-role-badge {
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Role Specific Colors */
+.ll-navbar-role-badge.admin    { background: rgba(239, 68, 68, 0.1); color: #dc2626; }
+.ll-navbar-role-badge.lender   { background: var(--color-accent); color: var(--color-primary); }
+.ll-navbar-role-badge.borrower { background: rgba(59, 130, 246, 0.1); color: #2563eb; }
+.ll-navbar-role-badge.analyst  { background: rgba(245, 158, 11, 0.1); color: #d97706; }
+
+.avatar-sm {
+  border: 2px solid #fff;
+}
+
+.transition-hover {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.transition-hover:hover {
+  opacity: 0.9;
+}
