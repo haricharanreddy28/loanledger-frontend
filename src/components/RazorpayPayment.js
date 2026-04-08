@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosConfig';
+import { useAuth } from '../context/AuthContext';
 
-const RazorpayPayment = ({ payment, onPaymentSuccess }) => {
+const RAZORPAY_KEY_ID = process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_test_SaiduyHaPeZWvC';
+
+const RazorpayPayment = ({ payment, onPaymentSuccess, onPaymentError }) => {
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+
       const script = document.createElement('script');
       script.src = 'https://checkout.razorpay.com/v1/checkout.js';
       script.onload = () => resolve(true);
@@ -18,77 +27,79 @@ const RazorpayPayment = ({ payment, onPaymentSuccess }) => {
     setLoading(true);
 
     try {
-      // Load Razorpay script
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
-        alert('Razorpay SDK failed to load. Please try again.');
-        setLoading(false);
+        const message = 'Razorpay SDK failed to load. Please try again.';
+        onPaymentError && onPaymentError(message);
+        alert(message);
         return;
       }
 
-      // Create order
-      const orderResponse = await axios.post('/api/payments/create-order', {
+      const orderResponse = await axiosInstance.post('/payments/create-order', {
         amount: payment.emiAmount,
         currency: 'INR',
         receipt: `EMI-${payment.id}`,
-        loanId: payment.loan.id,
-        paymentId: payment.id
+        loanId: payment.loanId,
+        paymentId: payment.id,
       });
 
-      if (!orderResponse.data.success) {
-        alert('Failed to create payment order');
-        setLoading(false);
+      if (!orderResponse.data?.success) {
+        const message = orderResponse.data?.message || 'Failed to create payment order';
+        onPaymentError && onPaymentError(message);
+        alert(message);
         return;
       }
 
       const order = orderResponse.data.data;
 
-      // Razorpay options
       const options = {
-        key: 'rzp_test_SaiduyHaPeZWvC', // Your Razorpay test key
-        amount: order.amount, // Amount in paisa
+        key: RAZORPAY_KEY_ID,
+        amount: order.amount,
         currency: order.currency,
         name: 'Loan Ledger',
-        description: `EMI Payment for Loan #${payment.loan.id}`,
+        description: `EMI Payment for Loan #${payment.loanId}`,
         order_id: order.id,
-        handler: async function (response) {
-          // Verify payment
+        handler: async (response) => {
           try {
-            const verifyResponse = await axios.post('/api/payments/verify', {
+            const verifyResponse = await axiosInstance.post('/payments/verify', {
               razorpayOrderId: response.razorpay_order_id,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpaySignature: response.razorpay_signature,
-              loanId: payment.loan.id,
-              paymentId: payment.id
+              loanId: payment.loanId,
+              paymentId: payment.id,
             });
 
-            if (verifyResponse.data.success) {
-              alert('Payment successful! Email notifications sent to both lender and borrower.');
+            if (verifyResponse.data?.success) {
+              alert('Payment successful!');
               onPaymentSuccess && onPaymentSuccess();
-            } else {
-              alert('Payment verification failed');
+              return;
             }
+
+            const message = verifyResponse.data?.message || 'Payment verification failed';
+            onPaymentError && onPaymentError(message);
+            alert(message);
           } catch (error) {
-            console.error('Payment verification error:', error);
-            alert('Payment verification failed');
+            const message = error.response?.data?.message || 'Payment verification failed';
+            onPaymentError && onPaymentError(message);
+            alert(message);
           }
         },
         prefill: {
-          name: 'Lender Name', // You can get this from user context
-          email: 'lender@example.com',
-          contact: '9999999999'
+          name: user?.name || payment.borrowerName || 'Loan Ledger User',
+          email: user?.email || '',
+          contact: '',
         },
         theme: {
-          color: '#3399cc'
-        }
+          color: '#3399cc',
+        },
       };
 
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
     } catch (error) {
-      console.error('Payment error:', error);
-      alert('Payment failed. Please try again.');
+      const message = error.response?.data?.message || 'Payment failed. Please try again.';
+      onPaymentError && onPaymentError(message);
+      alert(message);
     } finally {
       setLoading(false);
     }
@@ -98,9 +109,10 @@ const RazorpayPayment = ({ payment, onPaymentSuccess }) => {
     <button
       onClick={handlePayment}
       disabled={loading}
-      className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"
+      className="btn btn-primary btn-sm px-4 fw-bold"
+      style={{ borderRadius: 'var(--radius-md)' }}
     >
-      {loading ? 'Processing...' : `Pay ₹${payment.emiAmount}`}
+      {loading ? 'Processing...' : 'Remit'}
     </button>
   );
 };

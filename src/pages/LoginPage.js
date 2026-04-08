@@ -4,13 +4,17 @@ import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../api/axiosConfig';
 import '../styles/auth.css';
 
-const ADMIN_EMAIL = 'gouravkarumudi6@gmail.com';
+const ADMIN_EMAIL = (process.env.REACT_APP_ADMIN_EMAIL || 'admin@loanledger.com').trim().toLowerCase();
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({ email: '', pin: '', password: '' });
     const [otp, setOtp] = useState('');
     const [showOtp, setShowOtp] = useState(false);
     const [userMobile, setUserMobile] = useState('');
+    const [showResetPin, setShowResetPin] = useState(false);
+    const [resetMobile, setResetMobile] = useState('+91');
+    const [resetOtp, setResetOtp] = useState('');
+    const [resetPin, setResetPin] = useState('');
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [apiError, setApiError] = useState('');
@@ -18,7 +22,8 @@ const LoginPage = () => {
     const { login } = useAuth();
     const navigate = useNavigate();
 
-    const isAdmin = formData.email.trim().toLowerCase().endsWith('@owner.com');
+    const normalizedEmail = formData.email.trim().toLowerCase();
+    const isAdmin = normalizedEmail === ADMIN_EMAIL || normalizedEmail.endsWith('@owner.com');
 
     const handleEmailChange = useCallback((e) => {
         const email = e.target.value;
@@ -109,16 +114,56 @@ const LoginPage = () => {
         navigate('/');
     };
 
+    const handleSendResetOtp = async (e) => {
+        if (e) e.preventDefault();
+        setLoading(true);
+        setApiError('');
+        setErrors({});
+        try {
+            await axiosInstance.post('/auth/pin/reset/send-otp', { mobile: resetMobile });
+        } catch (err) {
+            setApiError(err.response?.data?.message || 'Failed to send reset OTP.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleConfirmResetPin = async (e) => {
+        if (e) e.preventDefault();
+        const newErrors = {};
+        if (!resetMobile.trim()) newErrors.resetMobile = 'Mobile is required';
+        if (resetOtp.trim().length !== 6) newErrors.resetOtp = 'Enter 6-digit OTP';
+        if (resetPin.trim().length !== 6) newErrors.resetPin = 'PIN must be exactly 6 digits';
+        setErrors(newErrors);
+        if (Object.keys(newErrors).length > 0) return;
+
+        setLoading(true);
+        setApiError('');
+        try {
+            await axiosInstance.post('/auth/pin/reset/confirm', { mobile: resetMobile, otp: resetOtp, newPin: resetPin });
+            setApiError('PIN reset successful. Please log in.');
+            setShowResetPin(false);
+            setResetOtp('');
+            setResetPin('');
+        } catch (err) {
+            setApiError(err.response?.data?.message || 'PIN reset failed.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="auth-container">
             <div className="auth-card">
                 <div className="auth-header">
                     <span className="auth-brand">Loan Ledger</span>
                     <h1 className="auth-title">
-                        {showOtp ? 'Security Check' : 'Welcome Back'}
+                        {showResetPin ? 'Reset Security PIN' : (showOtp ? 'Security Check' : 'Welcome Back')}
                     </h1>
                     <p className="auth-subtitle">
-                        {showOtp
+                        {showResetPin
+                            ? 'Verify via SMS and set a new PIN'
+                            : showOtp
                             ? 'Enter the verification code sent via SMS'
                             : 'Sign in to access your dashboard'}
                     </p>
@@ -129,7 +174,75 @@ const LoginPage = () => {
                         <div className="auth-alert-danger">{apiError}</div>
                     )}
 
-                    {!showOtp ? (
+                    {showResetPin ? (
+                        <form onSubmit={handleConfirmResetPin} className="otp-container">
+                            <div className="auth-form-group">
+                                <label className="auth-label">Mobile Number</label>
+                                <input
+                                    type="text"
+                                    className={`auth-input ${errors.resetMobile ? 'is-invalid' : ''}`}
+                                    placeholder="+91XXXXXXXXXX"
+                                    value={resetMobile}
+                                    onChange={e => setResetMobile(e.target.value)}
+                                    required
+                                />
+                                {errors.resetMobile && <div className="auth-error-msg">{errors.resetMobile}</div>}
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={handleSendResetOtp}
+                                className="auth-btn-secondary"
+                                disabled={loading}
+                                style={{ marginBottom: '10px' }}
+                            >
+                                {loading ? 'Sending...' : 'Send OTP'}
+                            </button>
+
+                            <div className="auth-form-group">
+                                <label className="auth-label">OTP</label>
+                                <input
+                                    type="text"
+                                    className={`auth-input otp-input-field ${errors.resetOtp ? 'is-invalid' : ''}`}
+                                    placeholder="000000"
+                                    maxLength="6"
+                                    value={resetOtp}
+                                    onChange={e => setResetOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                />
+                                {errors.resetOtp && <div className="auth-error-msg">{errors.resetOtp}</div>}
+                            </div>
+
+                            <div className="auth-form-group">
+                                <label className="auth-label">New 6-Digit PIN</label>
+                                <input
+                                    type="password"
+                                    className={`auth-input ${errors.resetPin ? 'is-invalid' : ''}`}
+                                    placeholder="XXXXXX"
+                                    maxLength="6"
+                                    value={resetPin}
+                                    onChange={e => setResetPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                />
+                                {errors.resetPin && <div className="auth-error-msg">{errors.resetPin}</div>}
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="auth-btn-primary"
+                                disabled={loading}
+                            >
+                                {loading ? 'Resetting...' : 'Confirm Reset'}
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => { setShowResetPin(false); setApiError(''); setErrors({}); }}
+                                className="auth-btn-secondary"
+                                style={{ marginTop: '10px' }}
+                            >
+                                Back to Login
+                            </button>
+                        </form>
+                    ) : !showOtp ? (
                         <form onSubmit={handleInitialLogin}>
                             {/* Email */}
                             <div className="auth-form-group">
@@ -191,6 +304,17 @@ const LoginPage = () => {
                             >
                                 {loading ? 'Authenticating...' : 'Sign In Securely'}
                             </button>
+
+                            {!isAdmin && (
+                                <button
+                                    type="button"
+                                    onClick={() => { setShowResetPin(true); setApiError(''); setErrors({}); }}
+                                    className="auth-btn-link"
+                                    style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '0.85rem', marginTop: '12px', cursor: 'pointer', fontWeight: 600, width: '100%' }}
+                                >
+                                    Forgot Security PIN?
+                                </button>
+                            )}
                         </form>
                     ) : (
                         <form onSubmit={handleVerifyOtp} className="otp-container">

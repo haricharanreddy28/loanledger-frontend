@@ -27,7 +27,9 @@ const AnalystReviewPanel = ({ onReviewSubmit }) => {
       const response = await axiosInstance.get('/analyst/pending-reviews');
       setLoans(response.data);
     } catch (err) {
-      setError('Failed to load loans for review');
+      console.error('Analyst queue fetch failed:', err);
+      const message = err.response?.data?.message || err.message || 'Failed to load loans for review';
+      setError(message);
     } finally {
       if (showLoading) setLoading(false);
     }
@@ -48,17 +50,21 @@ const AnalystReviewPanel = ({ onReviewSubmit }) => {
     }
     setSubmitLoading(true);
     try {
-      await axiosInstance.post('/analyst/submit-report', {
+      const payload = {
         loanId: selectedLoan.id,
         riskLevel: reportForm.riskLevel,
         eligibility: reportForm.eligibility,
         comments: reportForm.comments,
-      });
+      };
+      console.log('Submitting analyst report:', payload);
+      await axiosInstance.post('/analyst/submit-report', payload);
       fetchLoansForReview();
       setSelectedLoan(null);
       if (onReviewSubmit) onReviewSubmit();
     } catch (err) {
-      setSubmitMessage(err.response?.data?.message || 'Submission failed');
+      console.error('Analyst submit failed:', err);
+      const responseMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'Submission failed';
+      setSubmitMessage(responseMessage);
     } finally {
       setSubmitLoading(false);
     }

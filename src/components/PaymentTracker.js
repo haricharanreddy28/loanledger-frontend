@@ -28,16 +28,6 @@ const PaymentTracker = ({ loanId, isLender = false }) => {
     if (loanId) fetchPayments();
   }, [loanId, fetchPayments]);
 
-  const handleMakePayment = async (paymentId) => {
-    if (!window.confirm('Confirm EMI remittance? Funds will be transferred to the lender.')) return;
-    try {
-      await axiosInstance.post(`/borrower/payments/${paymentId}/pay`);
-      fetchPayments();
-    } catch (err) {
-      setPayMessage(err.response?.data?.message || 'Payment processing failed');
-    }
-  };
-
   const paidCount = payments.filter(p => p.status === 'PAID').length;
   const totalAmount = payments.reduce((sum, p) => sum + (p.emiAmount || 0), 0);
   const paidAmount = payments.filter(p => p.status === 'PAID').reduce((sum, p) => sum + (p.emiAmount || 0), 0);
@@ -134,13 +124,11 @@ const PaymentTracker = ({ loanId, isLender = false }) => {
                         onPaymentSuccess={fetchPayments}
                       />
                     ) : (
-                      <button
-                        className="btn btn-primary btn-sm px-4 fw-bold"
-                        onClick={() => handleMakePayment(payment.id)}
-                        style={{ borderRadius: 'var(--radius-md)' }}
-                      >
-                        Remit
-                      </button>
+                      <RazorpayPayment
+                        payment={payment}
+                        onPaymentSuccess={fetchPayments}
+                        onPaymentError={setPayMessage}
+                      />
                     )}
                   </td>
                 </tr>
